@@ -112,7 +112,8 @@ jobs:
 
       - name: Download QPDF
         run: |
-          pwsh build-scripts/win-download-qpdf.ps1 $QPDF_VERSION ${{ matrix.platform }}
+          build-scripts/win-download-qpdf.ps1 $Env.QPDF_VERSION ${{ matrix.platform }}
+        shell: pwsh
 
       - name: Build wheels
         uses: joerick/cibuildwheel@v2.1.1
