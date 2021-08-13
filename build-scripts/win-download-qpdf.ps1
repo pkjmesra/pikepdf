@@ -1,5 +1,6 @@
-$version = $args[0]
-$platform = $args[1]
+$platform = $args[0]
+
+$version = $Env:QPDF_VERSION
 
 if ($platform -eq "win_amd64") {
     $msvc = "msvc64"
