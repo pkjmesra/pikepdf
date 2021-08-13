@@ -51,7 +51,7 @@ jobs:
         if: matrix.platform == 'manylinux_x86_64'
         with:
           name: rtd-wheel
-          path: ./wheelhouse/pikepdf-*-cp37-cp37m-manylinux2010_x86_64.whl
+          path: ./wheelhouse/pikepdf-*-cp37-*-manylinux2010_x86_64.whl
           if-no-files-found: error
 
   wheels_macos:
@@ -105,9 +105,14 @@ jobs:
         with:
           python-version: "3.8"
 
+      - name: Install toml and read environment from pyproject.toml
+        run: |
+          python -m pip install toml
+          python build-scripts/environ-from-pyproject.py >> $GITHUB_ENV
+
       - name: Download QPDF
         run: |
-          build-scripts/win-download-qpdf.ps1 ${{ env.QPDF_VERSION }} ${{ matrix.platform }}
+          build-scripts/win-download-qpdf.ps1 $QPDF_VERSION ${{ matrix.platform }}
         shell: pwsh
 
       - name: Build wheels
@@ -137,15 +142,10 @@ jobs:
       - name: Install toml and read environment from pyproject.toml
         run: |
           python -m pip install toml
-          python - <<-EOF >> $GITHUB_ENV
-            import toml
-            t = toml.load('pyproject.toml')
-            env = t['tool']['cibuildwheel']['environment']
-            print('\n'.join(f'{k}={v}' for k, v in env.items()))
-          EOF
+          python build-scripts/environ-from-pyproject.py >> $GITHUB_ENV
 
       - name: Download QPDF
-        run: build-scripts/linux-download-qpdf.bash ${{ env.QPDF_MIN_VERSION }}
+        run: build-scripts/linux-download-qpdf.bash $QPDF_MIN_VERSION
 
       - name: Build QPDF
         run: build-scripts/linux-build-sdist-deps.bash
